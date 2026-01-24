@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model detalle_mantenimiento {
+  id_detalle         Int             @id @default(autoincrement())
+  tipo_mantenimiento String          @db.VarChar(50)
+  nombre_detalle     String          @db.VarChar(255)
+  mantenimiento      mantenimiento[]
+}
+
+model mantenimiento {
+  costomant             Float?
+  detalle_id            Int?
+  fechamant             DateTime?              @db.Date
+  idmant                Int                    @id @default(autoincrement())
+  idprop                Int?
+  idres                 Int?
+  idveh                 Int?
+  descripcion           String?                @db.VarChar(255)
+  detalle_mant          String?                @db.VarChar(255)
+  fotomant              String?                @db.VarChar(255)
+  otro_detalle          String?                @db.VarChar(255)
+  tipomant              String?                @db.VarChar(255)
+  vehiculo              vehiculo?              @relation(fields: [idveh], references: [idveh], onDelete: NoAction, onUpdate: NoAction, map: "fk2dk91k5354wh67qyeowvellkr")
+  detalle_mantenimiento detalle_mantenimiento? @relation(fields: [detalle_id], references: [id_detalle], onDelete: NoAction, onUpdate: NoAction, map: "fkcmorx1ksf7bco8veasvfnaq87")
+  reserva               reserva?               @relation(fields: [idres], references: [idres], onDelete: NoAction, onUpdate: NoAction, map: "fkdke8r86me481asmu7ygnov05t")
+  usuario               usuario?               @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkis0owv6xp5ipmv21ki0mw1ah6")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reserva {
+  costo             Int?
+  idcli             Int?
+  idres             Int             @id @default(autoincrement())
+  idveh             Int?
+  fechafin          DateTime?       @db.Timestamp(6)
+  fechafinalizacion DateTime?       @db.Timestamp(6)
+  fechainicio       DateTime?       @db.Timestamp(6)
+  fechares          DateTime?       @db.Timestamp(6)
+  estado            String?         @db.VarChar(255)
+  mantenimiento     mantenimiento[]
+  usuario           usuario?        @relation("ClienteReservas", fields: [idcli], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkhcb7l9qoy85ndceeubthuid7g")
+  vehiculo          vehiculo?       @relation(fields: [idveh], references: [idveh], onDelete: NoAction, onUpdate: NoAction, map: "fkj2yfy568nnvlnkxm9k7329j4s")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model usuario {
+  estprop              Boolean?
+  idprop               Int                    @id @default(autoincrement())
+  apeprop              String?                @db.VarChar(255)
+  dniprop              String?                @db.VarChar(255)
+  emailprop            String?                @db.VarChar(255)
+  nomprop              String?                @db.VarChar(255)
+  password             String?                @db.VarChar(255)
+  rol                  String?                @db.VarChar(255)
+  mantenimiento        mantenimiento[]
+  reserva              reserva[]              @relation("ClienteReservas")
+  vehiculo             vehiculo[]
+  vehiculos_eliminados vehiculos_eliminados[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model vehiculo {
+  anioveh                Int?
+  fecharegistro          DateTime?              @db.Date
+  horas_uso              Float?
+  idprop                 Int?
+  idveh                  Int                    @id @default(autoincrement())
+  peso                   Float?
+  potencia               Float?
+  precioalquilo          Float?
+  requiere_certificacion Boolean?
+  accesorios             String?                @db.VarChar(500)
+  capacidad              String?                @db.VarChar(255)
+  categoria              String?                @db.VarChar(255)
+  dimensiones            String?                @db.VarChar(255)
+  estveh                 String?                @db.VarChar(255)
+  fotoveh                String?                @db.VarChar(255)
+  marveh                 String?                @db.VarChar(255)
+  modveh                 String?                @db.VarChar(255)
+  plaveh                 String?                @db.VarChar(255)
+  mantenimiento          mantenimiento[]
+  reserva                reserva[]
+  usuario                usuario?               @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fk2pu1225mw666tkb93d0dhd49v")
+  vehiculos_eliminados   vehiculos_eliminados[]
+}
+
+model vehiculos_eliminados {
+  fecharegistro DateTime @db.Date
+  id            Int      @id @default(autoincrement())
+  idprop        Int
+  idveh         Int
+  razon         String   @db.VarChar(255)
+  vehiculo      vehiculo @relation(fields: [idveh], references: [idveh], onDelete: NoAction, onUpdate: NoAction, map: "fkqy7dvq9g8rcrd4c0lmperqxcb")
+  usuario       usuario  @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fksanpo3lbpuvrt9yxfhec1hsqm")
+}
+
+enum Rol {
+  PROPIETARIO
+  CLIENTE
+  ADMINISTRADOR
+  CONTRATISTA
+}
+
+enum EstadoVehiculo {
+  DISPONIBLE
+  OCUPADO
+  EN_MANTENIMIENTO
+  FUERA_SERVICIO
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  RECHAZADA
+  ESPERANDO_CLIENTE
+  EN_USO
+  ESPERANDO_PROPIETARIO
+  FINALIZADA
+  CANCELADA
+}
