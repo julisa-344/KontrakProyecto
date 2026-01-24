@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Calendar } from "lucide-react"
+import { toast } from "sonner"
 
 interface ReservaFormProps {
   equipoId: number
@@ -72,11 +73,14 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
         throw new Error(data.error || "Error al crear la reserva")
       }
 
+      toast.success(`¡Reserva creada! Total: S/. ${data.reserva.costo.toFixed(2)}`)
+      
       // Redirigir a mis reservas
       router.push("/mis-reservas")
       router.refresh()
     } catch (err: any) {
       setError(err.message)
+      toast.error(err.message)
     } finally {
       setLoading(false)
     }

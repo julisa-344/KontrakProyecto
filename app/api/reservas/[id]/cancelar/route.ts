@@ -45,6 +45,10 @@ export async function POST(
       )
     }
 
+    if (!reserva.idveh) {
+      return NextResponse.json({ error: "Reserva inválida" }, { status: 400 })
+    }
+
     // Cancelar reserva y liberar equipo en una transacción
     await prisma.$transaction([
       // Actualizar reserva
