@@ -1,23 +1,47 @@
-import { prisma } from "@/lib/prisma"
-import { notFound } from "next/navigation"
+"use client"
+
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { notFound, useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft, CheckCircle, AlertCircle, Gauge, Weight, Ruler, Box } from "lucide-react"
 import { ReservaForm } from "@/components/ReservaForm"
-import { auth } from "@/auth"
 
-export default async function EquipoDetallePage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const session = await auth()
-  
-  const equipo = await prisma.vehiculo.findUnique({
-    where: {
-      idveh: parseInt(params.id)
+export default function EquipoDetallePage() {
+  const { data: session, status } = useSession()
+  const params = useParams()
+  const [equipo, setEquipo] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchEquipo() {
+      try {
+        const res = await fetch(`/api/vehiculos/${params.id}`)
+        if (!res.ok) {
+          setEquipo(null)
+          return
+        }
+        const data = await res.json()
+        setEquipo(data)
+      } catch (error) {
+        setEquipo(null)
+      } finally {
+        setLoading(false)
+      }
     }
-  })
+    fetchEquipo()
+  }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
 
   if (!equipo) {
     notFound()
@@ -164,30 +188,36 @@ export default async function EquipoDetallePage({
             </p>
           )}
 
-      {/* Formulario de Reserva */}
-      {session?.user && (
-        <div className="mt-12">
-          <ReservaForm 
-            equipoId={equipo.idveh} 
-            precioAlquilo={equipo.precioalquilo || 0}
-            disponible={disponible}
-          />
-        </div>
-      )}
+          {/* Formulario de Reserva */}
+          {status === "authenticated" && session?.user && (
+            <div className="mt-8">
+              <ReservaForm 
+                equipoId={equipo.idveh} 
+                precioAlquilo={equipo.precioalquilo || 0}
+                disponible={disponible}
+              />
+            </div>
+          )}
 
-      {!session?.user && disponible && (
-        <div className="mt-12 bg-accent/20 border border-accent rounded-lg p-6 text-center">
-          <p className="text-lg text-gray-700 mb-4">
-            Inicia sesión para realizar un alquiler
-          </p>
-          <Link 
-            href="/login"
-            className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
-          >
-            Iniciar Sesión
-          </Link>
-        </div>
-      )}
+          {status === "unauthenticated" && disponible && (
+            <div className="mt-8 bg-accent/20 border border-accent rounded-lg p-6 text-center">
+              <p className="text-lg text-gray-700 mb-4">
+                Inicia sesión para realizar un alquiler
+              </p>
+              <Link 
+                href="/login"
+                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
+              >
+                Iniciar Sesión
+              </Link>
+            </div>
+          )}
+
+          {status === "loading" && (
+            <div className="mt-8 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          )}
         </div>
       </div>
     </div>

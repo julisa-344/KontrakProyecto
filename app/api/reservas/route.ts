@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Error al crear reserva:", error)
+
     return NextResponse.json(
       { error: "Error al procesar la reserva" },
       { status: 500 }

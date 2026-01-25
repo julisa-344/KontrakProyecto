@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     // Validar que el email no exista
     const existingUser = await prisma.usuario.findUnique({
-      where: { email }
+      where: { emailprop: email }
     })
 
     if (existingUser) {
@@ -24,26 +24,25 @@ export async function POST(req: NextRequest) {
     // Crear usuario con rol CONTRATISTA
     const usuario = await prisma.usuario.create({
       data: {
-        nombres,
-        apellidos,
-        dni,
-        email,
+        nomprop: nombres,
+        apeprop: apellidos,
+        dniprop: dni,
+        emailprop: email,
         password: hashedPassword,
         rol: "CONTRATISTA",
-        estado: true
+        estprop: true
       }
     })
 
     return NextResponse.json({
       message: "Usuario registrado exitosamente",
       usuario: {
-        id: usuario.id,
-        email: usuario.email,
-        nombres: usuario.nombres
+        id: usuario.idprop,
+        email: usuario.emailprop,
+        nombres: usuario.nomprop
       }
     })
   } catch (error) {
-    console.error("Error en registro:", error)
     return NextResponse.json(
       { error: "Error al registrar usuario" },
       { status: 500 }

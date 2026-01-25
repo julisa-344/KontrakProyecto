@@ -2,12 +2,25 @@
 
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
-import { LogOut, User, Menu, X } from "lucide-react"
-import { useState } from "react"
+import { LogOut, User, Menu, X, ShoppingCart } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export function Header() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [reservasCount, setReservasCount] = useState(0)
+
+  // Obtener el conteo de reservas activas
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/reservas/count')
+        .then(res => res.json())
+        .then(data => setReservasCount(data.count || 0))
+        .catch(() => setReservasCount(0))
+    } else {
+      setReservasCount(0)
+    }
+  }, [session])
 
   return (
     <header className="bg-secondary text-white shadow-lg sticky top-0 z-50">
@@ -34,17 +47,35 @@ export function Header() {
             
             {session ? (
               <>
-                <Link href="/mis-reservas" className="hover:text-primary transition">
-                  Mis Reservas
+                <Link 
+                  href="/mis-reservas" 
+                  className="relative hover:text-primary transition flex items-center gap-2"
+                  title="Mis Reservas"
+                >
+                  <div className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {reservasCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {reservasCount}
+                      </span>
+                    )}
+                  </div>
+                  <span>Mis Reservas</span>
                 </Link>
                 <Link href="/historial" className="hover:text-primary transition">
                   Historial
                 </Link>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2">
-                    <User className="w-5 h-5" />
+                <div className="flex items-center space-x-3 border-l border-gray-600 pl-6">
+                  <Link 
+                    href="/mis-reservas"
+                    className="flex items-center space-x-2 hover:text-primary transition"
+                    title="Mi Cuenta"
+                  >
+                    <div className="bg-primary/20 rounded-full p-2">
+                      <User className="w-5 h-5" />
+                    </div>
                     <span className="text-sm">{session.user?.name}</span>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="flex items-center space-x-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg transition"

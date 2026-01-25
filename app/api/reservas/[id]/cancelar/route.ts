@@ -70,7 +70,6 @@ export async function POST(
 
     return NextResponse.redirect(new URL("/mis-reservas", req.url))
   } catch (error) {
-    console.error("Error al cancelar reserva:", error)
     return NextResponse.json(
       { error: "Error al cancelar la reserva" },
       { status: 500 }
