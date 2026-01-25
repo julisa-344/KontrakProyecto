@@ -153,7 +153,7 @@ export function MiCuentaContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombres</label>
                 {edit ? (
                   <input
-                    value={form.nomprop}
+                    value={form.nomprop ?? ""}
                     onChange={(e) => setForm({ ...form, nomprop: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
@@ -166,7 +166,7 @@ export function MiCuentaContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Apellidos</label>
                 {edit ? (
                   <input
-                    value={form.apeprop}
+                    value={form.apeprop ?? ""}
                     onChange={(e) => setForm({ ...form, apeprop: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
@@ -178,7 +178,7 @@ export function MiCuentaContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">DNI</label>
                 {edit ? (
                   <input
-                    value={form.dniprop}
+                    value={form.dniprop ?? ""}
                     onChange={(e) => setForm({ ...form, dniprop: e.target.value })}
                     placeholder="8 dígitos"
                     maxLength={8}
@@ -193,7 +193,7 @@ export function MiCuentaContent() {
                 {edit ? (
                   <input
                     type="email"
-                    value={form.emailprop}
+                    value={form.emailprop ?? ""}
                     onChange={(e) => setForm({ ...form, emailprop: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
@@ -207,7 +207,7 @@ export function MiCuentaContent() {
                 {edit ? (
                   <input
                     type="tel"
-                    value={form.telefonoprop}
+                    value={form.telefonoprop ?? ""}
                     onChange={(e) => setForm({ ...form, telefonoprop: e.target.value })}
                     placeholder="ej. 989 123 456"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"

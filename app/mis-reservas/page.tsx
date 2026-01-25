@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import type { EstadoReserva } from "@prisma/client"
 import { StatusBadge } from "@/components/StatusBadge"
 import Link from "next/link"
 
@@ -81,28 +82,28 @@ export default async function MisReservasPage() {
                       <h3 className="text-xl font-bold text-secondary">
                         {reserva.vehiculo?.marveh} {reserva.vehiculo?.modveh}
                       </h3>
-                      <StatusBadge estado={reserva.estado} />
+                      <StatusBadge estado={(reserva.estado || "PENDIENTE") as EstadoReserva} />
                     </div>
                     <p className="text-gray-600 mb-2">Código: {reserva.vehiculo?.plaveh}</p>
                     <div className="text-sm text-gray-600 space-y-1">
                       <p>
                         <span className="font-semibold">Inicio:</span>{" "}
-                        {format(new Date(reserva.fechainicio), "PPP 'a las' p", { locale: es })}
+                        {reserva.fechainicio ? format(new Date(reserva.fechainicio), "PPP 'a las' p", { locale: es }) : "—"}
                       </p>
                       <p>
                         <span className="font-semibold">Fin:</span>{" "}
-                        {format(new Date(reserva.fechafin), "PPP 'a las' p", { locale: es })}
+                        {reserva.fechafin ? format(new Date(reserva.fechafin), "PPP 'a las' p", { locale: es }) : "—"}
                       </p>
                       <p>
                         <span className="font-semibold">Reservado el:</span>{" "}
-                        {format(new Date(reserva.fechares), "PPP", { locale: es })}
+                        {reserva.fechares ? format(new Date(reserva.fechares), "PPP", { locale: es }) : "—"}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right">
                     <p className="text-3xl font-bold text-primary mb-2">
-                      S/. {reserva.costo.toFixed(2)}
+                      S/. {(reserva.costo ?? 0).toFixed(2)}
                     </p>
                     {puedeCancelar && (
                       <form action={`/api/reservas/${reserva.idres}/cancelar`} method="POST">

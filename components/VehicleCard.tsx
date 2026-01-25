@@ -1,10 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Gauge, Weight } from "lucide-react"
-import type { Vehiculo } from "@prisma/client"
+import type { vehiculo } from "@prisma/client"
 
 interface VehicleCardProps {
-  vehiculo: Vehiculo
+  vehiculo: vehiculo
 }
 
 export function VehicleCard({ vehiculo }: VehicleCardProps) {
@@ -67,7 +67,7 @@ export function VehicleCard({ vehiculo }: VehicleCardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-primary">
-                S/. {vehiculo.precioalquilo.toFixed(2)}
+                S/. {(vehiculo.precioalquilo ?? 0).toFixed(2)}
               </p>
               <p className="text-xs text-gray-500">por día</p>
             </div>

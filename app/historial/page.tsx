@@ -1,76 +1,90 @@
-import { auth } from "@/auth"
-import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-import { StatusBadge } from "@/components/StatusBadge"
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import type { EstadoReserva } from "@prisma/client";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export default async function HistorialPage() {
-  const session = await auth()
+  const session = await auth();
 
   if (!session?.user) {
-    redirect("/login")
+    redirect("/login");
   }
 
-  const userId = parseInt((session.user as any).id)
+  const userId = parseInt((session.user as any).id);
 
-  // Replicar lógica de Spring: solo reservas "muertas" (finalizadas hace más de 1 día)
-  const haceUnDia = new Date()
-  haceUnDia.setDate(haceUnDia.getDate() - 1)
-
+  // Mostrar todas las reservas del usuario (pedidos): pendientes, en curso y finalizadas
   const reservas = await prisma.reserva.findMany({
-    where: {
-      idcli: userId,
-      estado: {
-        in: ["FINALIZADA", "CANCELADA", "RECHAZADA"]
-      },
-      fechafinalizacion: {
-        lt: haceUnDia
-      }
-    },
-    include: {
-      vehiculo: true
-    },
-    orderBy: {
-      fechares: 'desc'
-    }
-  })
+    where: { idcli: userId },
+    include: { vehiculo: true },
+    orderBy: { fechares: "desc" },
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-secondary mb-8">Historial de Alquileres</h1>
+      <h1 className="text-4xl font-bold text-secondary mb-8">
+        Historial de Alquileres
+      </h1>
 
       {reservas.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-xl text-gray-500">No tienes historial de reservas</p>
+          <p className="text-xl text-gray-500">
+            No tienes historial de reservas
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white rounded-lg shadow-md">
             <thead className="bg-secondary text-white">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Equipo</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Fechas</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Estado</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">Costo</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">
+                  Equipo
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">
+                  Fechas
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">
+                  Estado
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold">
+                  Costo
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {reservas.map((reserva) => (
                 <tr key={reserva.idres} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
-                    <p className="font-semibold">{reserva.vehiculo?.marveh} {reserva.vehiculo?.modveh}</p>
-                    <p className="text-sm text-gray-600">Código: {reserva.vehiculo?.plaveh}</p>
+                    <p className="font-semibold">
+                      {[reserva.vehiculo?.marveh, reserva.vehiculo?.modveh].filter(Boolean).join(" ") || "Equipo"}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Código: {reserva.vehiculo?.plaveh}
+                    </p>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    <p>{format(new Date(reserva.fechainicio), "dd/MM/yyyy", { locale: es })}</p>
-                    <p>{format(new Date(reserva.fechafin), "dd/MM/yyyy", { locale: es })}</p>
+                    <p>
+                      {reserva.fechainicio
+                        ? format(new Date(reserva.fechainicio), "dd/MM/yyyy", {
+                            locale: es,
+                          })
+                        : "Sin fecha"}
+                    </p>
+                    <p>
+                      {reserva.fechafin
+                        ? format(new Date(reserva.fechafin), "dd/MM/yyyy", {
+                            locale: es,
+                          })
+                        : "Sin fecha"}
+                    </p>
                   </td>
                   <td className="px-6 py-4">
-                    <StatusBadge estado={reserva.estado} />
+                    <StatusBadge estado={(reserva.estado || "PENDIENTE") as EstadoReserva} />
                   </td>
                   <td className="px-6 py-4 font-bold text-primary">
-                    S/. {reserva.costo.toFixed(2)}
+                    S/. {(reserva.costo ?? 0).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -79,5 +93,5 @@ export default async function HistorialPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

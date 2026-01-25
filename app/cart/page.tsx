@@ -7,6 +7,11 @@ import Link from "next/link"
 import { MessageCircle, CheckCircle, Package, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 
+function getHoyLocal(): string {
+  const d = new Date()
+  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, "0"), String(d.getDate()).padStart(2, "0")].join("-")
+}
+
 export default function CartPage() {
   const { items, removeFromCart, clearCart } = useCart()
   const { data: session } = useSession()
@@ -35,22 +40,19 @@ export default function CartPage() {
     setLoading(true)
     setError("")
     setFechaError("")
-    // Validaciones de fechas
-    const hoy = new Date()
-    hoy.setHours(0,0,0,0)
-    const inicio = fechaInicio ? new Date(fechaInicio) : null
-    const fin = fechaFin ? new Date(fechaFin) : null
-    if (!inicio || !fin) {
+    // Validaciones: comparar fechas como YYYY-MM-DD (evita problemas de zona horaria con new Date("YYYY-MM-DD"))
+    if (!fechaInicio || !fechaFin) {
       setFechaError("Debes seleccionar ambas fechas.")
       setLoading(false)
       return
     }
-    if (inicio < hoy) {
+    const hoyStr = getHoyLocal()
+    if (fechaInicio < hoyStr) {
       setFechaError("La fecha de inicio no puede ser anterior a hoy.")
       setLoading(false)
       return
     }
-    if (fin < inicio) {
+    if (fechaFin < fechaInicio) {
       setFechaError("La fecha de fin no puede ser anterior a la de inicio.")
       setLoading(false)
       return
@@ -177,7 +179,7 @@ export default function CartPage() {
                   type="date"
                   required
                   value={fechaInicio}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={getHoyLocal()}
                   onChange={(e) => setFechaInicio(e.target.value)}
                   className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
@@ -188,7 +190,7 @@ export default function CartPage() {
                   type="date"
                   required
                   value={fechaFin}
-                  min={fechaInicio || new Date().toISOString().split("T")[0]}
+                  min={fechaInicio || getHoyLocal()}
                   onChange={(e) => setFechaFin(e.target.value)}
                   className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
@@ -219,13 +221,20 @@ export default function CartPage() {
                 )}
               </div>
             )}
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
               <button
                 type="submit"
-                className="bg-primary text-white px-6 py-2.5 rounded-lg font-semibold flex-1 hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-primary text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? "Enviando..." : "Solicitar alquiler"}
+              </button>
+              <button
+                type="button"
+                onClick={clearCart}
+                className="text-gray-600 hover:text-red-600 text-sm font-medium py-1 transition"
+              >
+                Vaciar carrito
               </button>
             </div>
           </form>
