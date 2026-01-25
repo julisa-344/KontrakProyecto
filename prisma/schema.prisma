@@ -85,7 +85,7 @@ model vehiculo {
   estveh                 String?                @db.VarChar(255)
   fotoveh                String?                @db.VarChar(255)
   marveh                 String?                @db.VarChar(255)
-  modveh                 String?                @db.VarChar(255)
+  modveh                 String?                @db.VarChar(255) @unique
   plaveh                 String?                @db.VarChar(255)
   mantenimiento          mantenimiento[]
   reserva                reserva[]

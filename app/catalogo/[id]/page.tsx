@@ -94,7 +94,7 @@ export default function EquipoDetallePage() {
 
           {/* Título */}
           <h1 className="text-4xl font-bold text-secondary mb-2">
-            {equipo.marveh} {equipo.modveh}
+            {equipo.modveh}
           </h1>
           <p className="text-xl text-gray-600 mb-4">Código: {equipo.plaveh}</p>
 
