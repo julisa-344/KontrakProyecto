@@ -4,6 +4,7 @@ import "./globals.css"
 import { Header } from "@/components/Header"
 import { Footer } from "@/components/Footer"
 import { Providers } from "@/components/Providers"
+import { AOSInit } from "@/app/aos-init"
 import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Providers>
+          <AOSInit />
           <Header />
           <main className="flex-1">
             {children}

@@ -1,15 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useCart } from "@/components/CartContext"
 import { useSession } from "next-auth/react"
 import { notFound, useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, CheckCircle, AlertCircle, Gauge, Weight, Ruler, Box } from "lucide-react"
+import { ArrowRight, CheckCircle, Truck, Clock, Shield, Weight, Ruler, Box } from "lucide-react"
 import { ReservaForm } from "@/components/ReservaForm"
 
 export default function EquipoDetallePage() {
   const { data: session, status } = useSession()
+  const { addToCart, items: cartItems } = useCart()
   const params = useParams()
   const [equipo, setEquipo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -56,7 +58,7 @@ export default function EquipoDetallePage() {
         href="/catalogo"
         className="inline-flex items-center gap-2 text-primary hover:underline mb-6"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowRight className="w-4 h-4" />
         Volver al catálogo
       </Link>
 
@@ -105,7 +107,7 @@ export default function EquipoDetallePage() {
               </div>
             ) : (
               <div className="flex items-center gap-2 text-orange-600">
-                <AlertCircle className="w-5 h-5" />
+                <Clock className="w-5 h-5" />
                 <span className="font-semibold">No disponible actualmente</span>
               </div>
             )}
@@ -126,7 +128,7 @@ export default function EquipoDetallePage() {
             <div className="grid grid-cols-2 gap-4">
               {equipo.potencia && (
                 <div className="flex items-start gap-3">
-                  <Gauge className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                  <Truck className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="text-sm text-gray-600">Potencia</p>
                     <p className="font-semibold">{equipo.potencia} HP</p>
@@ -174,7 +176,7 @@ export default function EquipoDetallePage() {
           {equipo.requiere_certificacion && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <p className="text-yellow-800 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
+                <Shield className="w-5 h-5" />
                 <span className="font-semibold">
                   Este equipo requiere certificación especial para operar
                 </span>
@@ -188,30 +190,28 @@ export default function EquipoDetallePage() {
             </p>
           )}
 
-          {/* Formulario de Reserva */}
-          {status === "authenticated" && session?.user && (
-            <div className="mt-8">
+          {/* Botón Agregar al Carrito o Formulario de Reserva */}
+          <div className="mt-8">
+            <button
+              className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition mb-4 w-full"
+              disabled={cartItems.some((i) => i.id === equipo.idveh)}
+              onClick={() => addToCart({
+                id: equipo.idveh,
+                nombre: `${equipo.marveh} ${equipo.modveh}`,
+                precio: equipo.precioalquilo || 0,
+                imagen: equipo.fotoveh || undefined
+              })}
+            >
+              {cartItems.some((i) => i.id === equipo.idveh) ? "Ya en el carrito" : "Agregar al carrito"}
+            </button>
+            {status === "authenticated" && session?.user && (
               <ReservaForm 
                 equipoId={equipo.idveh} 
                 precioAlquilo={equipo.precioalquilo || 0}
                 disponible={disponible}
               />
-            </div>
-          )}
-
-          {status === "unauthenticated" && disponible && (
-            <div className="mt-8 bg-accent/20 border border-accent rounded-lg p-6 text-center">
-              <p className="text-lg text-gray-700 mb-4">
-                Inicia sesión para realizar un alquiler
-              </p>
-              <Link 
-                href="/login"
-                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition"
-              >
-                Iniciar Sesión
-              </Link>
-            </div>
-          )}
+            )}
+          </div>S
 
           {status === "loading" && (
             <div className="mt-8 text-center">
