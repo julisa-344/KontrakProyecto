@@ -14,6 +14,7 @@ async function main() {
   // Crear usuarios
   const adminPassword = await bcrypt.hash('admin123', 10)
   const clientePassword = await bcrypt.hash('cliente123', 10)
+  const contratistaPassword = await bcrypt.hash('contratista123', 10)
 
   const admin = await prisma.usuario.create({
     data: {
@@ -35,6 +36,18 @@ async function main() {
       emailprop: 'juan@ejemplo.com',
       password: clientePassword,
       rol: 'CLIENTE',
+      estprop: true
+    }
+  })
+
+  const contratista1 = await prisma.usuario.create({
+    data: {
+      nomprop: 'Carlos',
+      apeprop: 'López',
+      dniprop: '11223344',
+      emailprop: 'contratista@ejemplo.com',
+      password: contratistaPassword,
+      rol: 'CONTRATISTA',
       estprop: true
     }
   })
@@ -207,17 +220,16 @@ async function main() {
 
   console.log('✅ Maquinaria creada (8 equipos)')
 
-  console.log('\n📋 Credenciales de acceso:')
+  console.log('\n📋 Credenciales de acceso (solo CLIENTE y CONTRATISTA pueden iniciar sesión en esta app):')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log('👨‍💼 ADMINISTRADOR:')
-  console.log('   Email: admin@autorent.com')
-  console.log('   Password: admin123')
-  console.log('\n👤 CLIENTE:')
+  console.log('👤 CLIENTE:')
   console.log('   Email: juan@ejemplo.com')
   console.log('   Password: cliente123')
-  console.log('\n🏢 PROPIETARIO:')
-  console.log('   Email: maria@ejemplo.com')
-  console.log('   Password: propietario123')
+  console.log('\n🔧 CONTRATISTA:')
+  console.log('   Email: contratista@ejemplo.com')
+  console.log('   Password: contratista123')
+  console.log('\n👨‍💼 ADMINISTRADOR (solo backend): admin@autorent.com / admin123')
+  console.log('🏢 PROPIETARIO (solo backend): maria@ejemplo.com / propietario123')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
 }
 

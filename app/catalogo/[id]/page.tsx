@@ -211,7 +211,7 @@ export default function EquipoDetallePage() {
                 disponible={disponible}
               />
             )}
-          </div>S
+          </div>
 
           {status === "loading" && (
             <div className="mt-8 text-center">

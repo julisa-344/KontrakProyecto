@@ -6,7 +6,7 @@ export default auth((req) => {
   const pathname = req.nextUrl.pathname
 
   // Rutas protegidas que requieren autenticación
-  const protectedRoutes = ['/mis-reservas', '/historial']
+  const protectedRoutes = ['/mis-reservas', '/historial', '/mi-cuenta']
   
   if (protectedRoutes.some(route => pathname.startsWith(route)) && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', req.url))

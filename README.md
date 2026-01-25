@@ -10,21 +10,28 @@ cd autorent-client
 npm install
 ```
 
-### 2. Configurar variables de entorno
+### 2. Configurar variables de entorno (Neon DB)
 
-Crea un archivo `.env` basado en `.env.example`:
+1. Crea un proyecto en [Neon](https://console.neon.tech) y obtén las URLs en "Connection details".
+2. Copia `.env.example` a `.env` y rellena:
+   - **DATABASE_URL**: Pooled connection + `?sslmode=require&pgbouncer=true`
+   - **DIRECT_URL**: Direct connection + `?sslmode=require`
+   - **AUTH_SECRET**: `openssl rand -base64 32`
+   - **NEXTAUTH_URL**: `http://localhost:3000` (en producción, tu dominio)
 
-```env
-DATABASE_URL="postgresql://neondb_owner:npg_LNorYx4Tz6fO@ep-divine-block-ah3b0tyj-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="genera-un-secret-con-openssl-rand-base64-32"
-```
-
-### 3. Generar cliente de Prisma
+### 3. Prisma y base de datos
 
 ```bash
 npx prisma generate
 ```
+
+**Base de datos nueva (solo Neon, sin Spring Boot):**
+```bash
+npx prisma migrate deploy   # o: npx prisma migrate dev
+npm run seed                # Usuarios y maquinaria de prueba
+```
+
+**Base de datos existente (compartida con Spring):** no ejecutes `migrate`; usa `npx prisma db pull` si cambió el esquema.
 
 ### 4. Ejecutar en desarrollo
 

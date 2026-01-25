@@ -43,14 +43,14 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/catalogo" className="hover:text-primary transition">
+            <Link href="/catalogo" className="hover:bg-white/20 hover:rounded px-2 py-1 -mx-2 transition">
               Catálogo
             </Link>
             
             {/* Carrito siempre visible */}
             <Link 
               href="/cart"
-              className="relative hover:text-primary transition flex items-center gap-2"
+              className="relative hover:bg-white/20 hover:rounded px-2 py-1 -mx-2 transition flex items-center gap-2"
               title="Carrito"
             >
               <div className="relative">
@@ -65,23 +65,23 @@ export function Header() {
             </Link>
             {session ? (
               <>
-                <Link href="/historial" className="hover:text-primary transition">
+                <Link href="/historial" className="hover:bg-white/20 hover:rounded px-2 py-1 -mx-2 transition">
                   Historial
                 </Link>
-                <div className="flex items-center space-x-3 border-l border-gray-600 pl-6">
+                <div className="flex items-center space-x-3 border-l border-white/30 pl-6">
                   <Link 
                     href="/mi-cuenta"
-                    className="flex items-center space-x-2 hover:text-primary transition"
+                    className="flex items-center space-x-2 hover:bg-white/20 hover:rounded-lg px-2 py-1.5 -mx-2 transition"
                     title="Mi Cuenta"
                   >
-                    <div className="bg-primary/20 rounded-full p-2 border-2 border-primary">
-                      <User className="w-5 h-5 text-primary" />
+                    <div className="bg-white/20 rounded-full p-2 border-2 border-white/50">
+                      <User className="w-5 h-5" />
                     </div>
-                    <span className="text-sm font-semibold text-primary">Cuenta</span>
+                    <span className="text-sm font-semibold">Cuenta</span>
                   </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="flex items-center space-x-1 bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg transition"
+                    className="flex items-center space-x-1 bg-white text-primary hover:bg-white/90 px-4 py-2 rounded-lg font-semibold transition"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Salir</span>
@@ -112,32 +112,46 @@ export function Header() {
           <div className="md:hidden mt-4 pb-4 space-y-3">
             <Link
               href="/catalogo"
-              className="block py-2 hover:text-primary transition"
+              className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition"
               onClick={() => setMobileMenuOpen(false)}
             >
               Catálogo
+            </Link>
+            <Link
+              href="/cart"
+              className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition flex items-center gap-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Carrito {cartItems.length > 0 && <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center">{cartItems.length}</span>}
             </Link>
             {session ? (
               <>
                 <Link
                   href="/mis-reservas"
-                  className="block py-2 hover:text-primary transition"
+                  className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Mis Reservas
                 </Link>
                 <Link
                   href="/historial"
-                  className="block py-2 hover:text-primary transition"
+                  className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Historial
                 </Link>
-                <div className="pt-2 border-t border-gray-700">
+                <Link
+                  href="/mi-cuenta"
+                  className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Mi Cuenta
+                </Link>
+                <div className="pt-2 border-t border-white/30">
                   <p className="text-sm mb-2">{session.user?.name}</p>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg transition"
+                    className="w-full bg-white text-primary hover:bg-white/90 px-4 py-2 rounded-lg font-semibold transition"
                   >
                     Cerrar Sesión
                   </button>

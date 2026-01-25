@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model detalle_mantenimiento {
@@ -59,6 +60,7 @@ model usuario {
   nomprop              String?                @db.VarChar(255)
   password             String?                @db.VarChar(255)
   rol                  String?                @db.VarChar(255)
+  telefonoprop         String?                @db.VarChar(20)
   mantenimiento        mantenimiento[]
   reserva              reserva[]              @relation("ClienteReservas")
   vehiculo             vehiculo[]

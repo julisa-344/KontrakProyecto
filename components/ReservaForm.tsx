@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Calendar } from "lucide-react"
+import { Calendar, MessageCircle, CheckCircle, Package } from "lucide-react"
 import { toast } from "sonner"
 
 interface ReservaFormProps {
@@ -12,14 +13,24 @@ interface ReservaFormProps {
 }
 
 export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaFormProps) {
+  const { data: session } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [dias, setDias] = useState(1)
+  const [telefono, setTelefono] = useState("")
+  const [success, setSuccess] = useState<{ urlWhatsApp: string; costo: number } | null>(null)
 
-  const hoy = new Date().toISOString().split('T')[0]
-  const mañana = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+  useEffect(() => {
+    if (session?.user) {
+      fetch("/api/mi-cuenta")
+        .then((r) => r.json())
+        .then((d) => { if (d?.telefonoprop) setTelefono(d.telefonoprop) })
+        .catch(() => {})
+    }
+  }, [session?.user])
 
+  const mañana = new Date(Date.now() + 86400000).toISOString().split("T")[0]
   const [fechainicio, setFechaInicio] = useState(mañana)
   const [fechafin, setFechaFin] = useState(mañana)
 
@@ -31,52 +42,40 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
   }
 
   const handleFechaInicioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nuevaFechaInicio = e.target.value
-    setFechaInicio(nuevaFechaInicio)
-    
-    // Si la fecha fin es anterior, ajustarla
-    if (nuevaFechaInicio > fechafin) {
-      setFechaFin(nuevaFechaInicio)
+    const v = e.target.value
+    setFechaInicio(v)
+    if (v > fechafin) {
+      setFechaFin(v)
       setDias(1)
     } else {
-      setDias(calcularDias(nuevaFechaInicio, fechafin))
+      setDias(calcularDias(v, fechafin))
     }
   }
 
   const handleFechaFinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const nuevaFechaFin = e.target.value
-    setFechaFin(nuevaFechaFin)
-    setDias(calcularDias(fechainicio, nuevaFechaFin))
+    setFechaFin(e.target.value)
+    setDias(calcularDias(fechainicio, e.target.value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setLoading(true)
-
     try {
-      const response = await fetch("/api/reservas", {
+      const res = await fetch("/api/reservas", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           equipoId,
           fechainicio,
-          fechafin
-        })
+          fechafin,
+          telefono: telefono.trim() || undefined,
+        }),
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Error al crear la reserva")
-      }
-
-      toast.success(`¡Reserva creada! Total: S/. ${data.reserva.costo.toFixed(2)}`)
-      
-      // Redirigir a mis reservas
-      router.push("/mis-reservas")
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Error al crear la reserva")
+      setSuccess({ urlWhatsApp: data.urlWhatsApp, costo: data.reserva?.costo ?? 0 })
+      toast.success("Reserva creada. Envía los datos al asesor por WhatsApp.")
       router.refresh()
     } catch (err: any) {
       setError(err.message)
@@ -91,9 +90,39 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
   if (!disponible) {
     return (
       <div className="bg-gray-100 border border-gray-300 rounded-lg p-6">
-        <p className="text-gray-600 text-center">
-          Este equipo no está disponible actualmente
+        <p className="text-gray-600 text-center">Este equipo no está disponible actualmente</p>
+      </div>
+    )
+  }
+
+  if (success) {
+    return (
+      <div className="bg-white border-2 border-green-200 rounded-lg p-6">
+        <div className="flex items-center gap-2 text-green-700 mb-4">
+          <CheckCircle className="w-6 h-6" />
+          <span className="font-semibold">Reserva registrada — Total: S/ {success.costo.toFixed(2)}</span>
+        </div>
+        <p className="text-gray-600 mb-4">
+          Envía los datos al asesor por WhatsApp para coordinar el pago y la entrega.
         </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <a
+            href={success.urlWhatsApp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-[#20bd5a] transition"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Enviar al asesor por WhatsApp
+          </a>
+          <a
+            href="/mis-reservas"
+            className="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary px-4 py-2.5 rounded-lg font-semibold hover:bg-primary/5 transition"
+          >
+            <Package className="w-5 h-5" />
+            Ver mis reservas
+          </a>
+        </div>
       </div>
     )
   }
@@ -103,9 +132,7 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
       <h3 className="text-2xl font-bold text-secondary mb-4">Realizar Alquiler</h3>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">{error}</div>
       )}
 
       <div className="space-y-4 mb-6">
@@ -123,7 +150,6 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
-
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             <Calendar className="w-4 h-4 inline mr-1" />
@@ -137,6 +163,18 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Tu teléfono / WhatsApp</label>
+          <input
+            type="tel"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            placeholder="ej. 989 123 456"
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          <p className="text-xs text-gray-500 mt-1">Para que el asesor pueda contactarte.</p>
         </div>
       </div>
 
@@ -165,9 +203,7 @@ export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaForm
         {loading ? "Procesando..." : "Confirmar Alquiler"}
       </button>
 
-      <p className="text-xs text-gray-500 mt-3 text-center">
-        Al confirmar, la reserva quedará pendiente de aprobación
-      </p>
+      <p className="text-xs text-gray-500 mt-3 text-center">Al confirmar, la reserva quedará pendiente de aprobación.</p>
     </form>
   )
 }
