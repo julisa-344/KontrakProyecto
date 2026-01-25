@@ -137,100 +137,99 @@ export default function CartPage() {
           </Link>
         </div>
       ) : (
-        <form className="space-y-4 max-w-2xl mx-auto" onSubmit={handleSubmit}>
-          {!session && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm flex flex-wrap items-center justify-between gap-2">
-              <span>Inicia sesión para poder solicitar el alquiler.</span>
-              <Link href="/login" className="text-primary font-semibold hover:underline">Iniciar sesión →</Link>
-            </div>
-          )}
-          {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-md p-6 flex items-center gap-4">
-              {item.imagen && (
-                <Image src={item.imagen} alt={item.nombre} width={80} height={60} className="rounded object-cover" />
-              )}
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-secondary">{item.nombre}</h3>
-                <p className="text-primary font-semibold">S/. {item.precio.toFixed(2)} / día</p>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Productos a la izquierda */}
+          <div className="md:col-span-2 space-y-4">
+            {items.map((item) => (
+              <Link key={item.id} href={`/catalogo/${item.id}`} className="block group">
+                <div className="bg-white rounded-lg shadow-md p-6 flex items-center gap-4 group-hover:shadow-lg transition">
+                  {item.imagen && (
+                    <Image src={item.imagen} alt={item.nombre} width={80} height={60} className="rounded object-cover" />
+                  )}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-secondary group-hover:underline">{item.nombre}</h3>
+                    <p className="text-primary font-semibold">S/. {item.precio.toFixed(2)} / día</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={e => { e.preventDefault(); removeFromCart(item.id); }}
+                    className="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-full transition flex items-center justify-center"
+                    title="Quitar del carrito"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Sidebar a la derecha */}
+          <form className="bg-white rounded-lg shadow-md p-6 space-y-4 h-fit sticky top-8" onSubmit={handleSubmit}>
+            {!session && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm flex flex-wrap items-center justify-between gap-2">
+                <span>Inicia sesión para poder solicitar el alquiler.</span>
+                <Link href="/login" className="text-primary font-semibold hover:underline">Iniciar sesión →</Link>
               </div>
-              <button
-                type="button"
-                onClick={() => removeFromCart(item.id)}
-                className="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-full transition flex items-center justify-center"
-                title="Quitar del carrito"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          ))}
-          <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
-                  <input
-                    type="date"
-                    required
-                    value={fechaInicio}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setFechaInicio(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de fin</label>
-                  <input
-                    type="date"
-                    required
-                    value={fechaFin}
-                    min={fechaInicio || new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
+            )}
+            <div className="grid gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
+                <input
+                  type="date"
+                  required
+                  value={fechaInicio}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de fin</label>
+                <input
+                  type="date"
+                  required
+                  value={fechaFin}
+                  min={fechaInicio || new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
               </div>
               {fechaError && (
                 <div className="text-red-600 text-sm font-medium mt-1">{fechaError}</div>
               )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tu teléfono / WhatsApp</label>
-              <input
-                type="tel"
-                required
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                placeholder="ej. 989 123 456"
-                className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-              <p className="text-xs text-gray-500 mt-1">Para que el asesor pueda contactarte y coordinar pago y entrega.</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tu teléfono / WhatsApp</label>
+                <input
+                  type="tel"
+                  required
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  placeholder="ej. 989 123 456"
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Para que el asesor pueda contactarte y coordinar pago y entrega.</p>
+              </div>
             </div>
-          </div>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <span>{error}</span>
-              {error.includes("sesión") && (
-                <Link href="/login" className="text-primary font-semibold hover:underline shrink-0">
-                  Ir a Iniciar sesión →
-                </Link>
-              )}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <span>{error}</span>
+                {error.includes("sesión") && (
+                  <Link href="/login" className="text-primary font-semibold hover:underline shrink-0">
+                    Ir a Iniciar sesión →
+                  </Link>
+                )}
+              </div>
+            )}
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="bg-primary text-white px-6 py-2.5 rounded-lg font-semibold flex-1 hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading}
+              >
+                {loading ? "Enviando..." : "Solicitar alquiler"}
+              </button>
             </div>
-          )}
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={clearCart}
-              className="bg-gray-200 hover:bg-gray-300 text-secondary px-6 py-2.5 rounded-lg font-semibold flex-1 transition"
-            >
-              Vaciar Carrito
-            </button>
-            <button
-              type="submit"
-              className="bg-primary text-white px-6 py-2.5 rounded-lg font-semibold flex-1 hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
-            >
-              {loading ? "Enviando..." : "Solicitar alquiler"}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       )}
     </div>
   )
