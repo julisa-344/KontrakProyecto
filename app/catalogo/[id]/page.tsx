@@ -63,28 +63,30 @@ export default function EquipoDetallePage() {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Imagen */}
-        <div className="relative h-96 bg-gray-200 rounded-lg overflow-hidden">
-          {equipo.fotoveh ? (
-            <Image
-              src={equipo.fotoveh}
-              alt={`${equipo.marveh} ${equipo.modveh}`}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18 18.5C18 19.8807 16.8807 21 15.5 21C14.1193 21 13 19.8807 13 18.5C13 17.1193 14.1193 16 15.5 16C16.8807 16 18 17.1193 18 18.5Z" />
-                <path d="M8.5 21C9.88071 21 11 19.8807 11 18.5C11 17.1193 9.88071 16 8.5 16C7.11929 16 6 17.1193 6 18.5C6 19.8807 7.11929 21 8.5 21Z" />
-                <path d="M5 16H7V13H17V16H19V12C19 11.4477 18.5523 11 18 11H6C5.44772 11 5 11.4477 5 12V16Z" />
-              </svg>
-            </div>
-          )}
+        {/* Columna Izquierda: Solo Imagen */}
+        <div>
+          <div className="relative h-96 bg-gray-200 rounded-lg overflow-hidden mb-6">
+            {equipo.fotoveh ? (
+              <Image
+                src={equipo.fotoveh}
+                alt={`${equipo.marveh} ${equipo.modveh}`}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 18.5C18 19.8807 16.8807 21 15.5 21C14.1193 21 13 19.8807 13 18.5C13 17.1193 14.1193 16 15.5 16C16.8807 16 18 17.1193 18 18.5Z" />
+                  <path d="M8.5 21C9.88071 21 11 19.8807 11 18.5C11 17.1193 9.88071 16 8.5 16C7.11929 16 6 17.1193 6 18.5C6 19.8807 7.11929 21 8.5 21Z" />
+                  <path d="M5 16H7V13H17V16H19V12C19 11.4477 18.5523 11 18 11H6C5.44772 11 5 11.4477 5 12V16Z" />
+                </svg>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Información */}
-        <div>
+        {/* Columna Derecha: Detalles y CTA */}
+        <div className="md:sticky md:top-24 h-fit">
           {/* Categoría */}
           {equipo.categoria && (
             <span className="inline-block bg-accent text-secondary text-sm font-semibold px-4 py-2 rounded-full mb-4">
@@ -120,6 +122,22 @@ export default function EquipoDetallePage() {
               S/. {equipo.precioalquilo?.toFixed(2) || '0.00'}
               <span className="text-lg text-gray-600 font-normal"> / día</span>
             </p>
+          </div>
+
+          {/* CTA: Botón agregar al carrito */}
+          <div className="mb-8">
+            <button
+              className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition mb-4 w-full"
+              disabled={cartItems.some((i) => i.id === equipo.idveh)}
+              onClick={() => addToCart({
+                id: equipo.idveh,
+                nombre: `${equipo.marveh} ${equipo.modveh}`,
+                precio: equipo.precioalquilo || 0,
+                imagen: equipo.fotoveh || undefined
+              })}
+            >
+              {cartItems.some((i) => i.id === equipo.idveh) ? "Ya en el carrito" : "Agregar al carrito"}
+            </button>
           </div>
 
           {/* Especificaciones Técnicas */}
@@ -189,29 +207,6 @@ export default function EquipoDetallePage() {
               Horas de uso: {equipo.horas_uso} hrs
             </p>
           )}
-
-          {/* Botón Agregar al Carrito o Formulario de Reserva */}
-          <div className="mt-8">
-            <button
-              className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition mb-4 w-full"
-              disabled={cartItems.some((i) => i.id === equipo.idveh)}
-              onClick={() => addToCart({
-                id: equipo.idveh,
-                nombre: `${equipo.marveh} ${equipo.modveh}`,
-                precio: equipo.precioalquilo || 0,
-                imagen: equipo.fotoveh || undefined
-              })}
-            >
-              {cartItems.some((i) => i.id === equipo.idveh) ? "Ya en el carrito" : "Agregar al carrito"}
-            </button>
-            {status === "authenticated" && session?.user && (
-              <ReservaForm 
-                equipoId={equipo.idveh} 
-                precioAlquilo={equipo.precioalquilo || 0}
-                disponible={disponible}
-              />
-            )}
-          </div>
 
           {status === "loading" && (
             <div className="mt-8 text-center">

@@ -37,7 +37,7 @@ export default async function HistorialPage() {
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white rounded-lg shadow-md">
-            <thead className="bg-secondary text-white">
+            <thead className="bg-orange-500 text-white">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
                   Equipo
@@ -58,7 +58,7 @@ export default async function HistorialPage() {
                 <tr key={reserva.idres} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <p className="font-semibold">
-                      {[reserva.vehiculo?.marveh, reserva.vehiculo?.modveh].filter(Boolean).join(" ") || "Equipo"}
+                      {[ reserva.vehiculo?.modveh].filter(Boolean).join(" ") || "Equipo"}
                     </p>
                     <p className="text-sm text-gray-600">
                       Código: {reserva.vehiculo?.plaveh}
