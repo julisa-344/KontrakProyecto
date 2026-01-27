@@ -12,6 +12,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  function esEmailValido(email: string) {
+    // Validación básica de email
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
@@ -19,6 +24,23 @@ export default function LoginPage() {
     const formData = new FormData(e.currentTarget)
     const email = formData.get("email") as string
     const password = formData.get("password") as string
+
+    // Validaciones simples UX
+    if (!email) {
+      toast.error("Por favor ingresa tu correo electrónico.")
+      setLoading(false)
+      return
+    }
+    if (!esEmailValido(email)) {
+      toast.error("El formato del correo electrónico no es válido.")
+      setLoading(false)
+      return
+    }
+    if (!password) {
+      toast.error("Por favor ingresa tu contraseña.")
+      setLoading(false)
+      return
+    }
 
     try {
       const result = await signIn("credentials", {

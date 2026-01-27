@@ -12,6 +12,10 @@ export default function RegistroPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  function contieneNumeros(texto: string) {
+    return /\d/.test(texto)
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
@@ -23,6 +27,18 @@ export default function RegistroPage() {
       dni: formData.get("dni") as string,
       email: formData.get("email") as string,
       password: formData.get("password") as string,
+    }
+
+    // Validación de nombres y apellidos
+    if (!data.nombres || contieneNumeros(data.nombres)) {
+      toast.error("El campo 'Nombres' no debe contener números.")
+      setLoading(false)
+      return
+    }
+    if (!data.apellidos || contieneNumeros(data.apellidos)) {
+      toast.error("El campo 'Apellidos' no debe contener números.")
+      setLoading(false)
+      return
     }
 
     const confirmPassword = formData.get("confirmPassword") as string
@@ -79,7 +95,28 @@ export default function RegistroPage() {
               name="nombres"
               type="text"
               required
+              onKeyDown={(e) => {
+                // Prevenir números y caracteres especiales no permitidos
+                if (e.key.length === 1 && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]$/.test(e.key)) {
+                  e.preventDefault()
+                  toast.warning("Este campo solo acepta letras, espacios, guiones y apóstrofes", {
+                    duration: 2000,
+                  })
+                }
+              }}
+              onInput={(e) => {
+                // Filtrar números si se pegan o ingresan de otra manera
+                const input = e.currentTarget
+                const valor = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, "")
+                if (input.value !== valor) {
+                  input.value = valor
+                  toast.warning("Se han eliminado caracteres no permitidos. Solo se aceptan letras, espacios, guiones y apóstrofes", {
+                    duration: 2000,
+                  })
+                }
+              }}
               className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Ej: Juan Carlos"
             />
           </div>
 
@@ -92,7 +129,28 @@ export default function RegistroPage() {
               name="apellidos"
               type="text"
               required
+              onKeyDown={(e) => {
+                // Prevenir números y caracteres especiales no permitidos
+                if (e.key.length === 1 && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]$/.test(e.key)) {
+                  e.preventDefault()
+                  toast.warning("Este campo solo acepta letras, espacios, guiones y apóstrofes", {
+                    duration: 2000,
+                  })
+                }
+              }}
+              onInput={(e) => {
+                // Filtrar números si se pegan o ingresan de otra manera
+                const input = e.currentTarget
+                const valor = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, "")
+                if (input.value !== valor) {
+                  input.value = valor
+                  toast.warning("Se han eliminado caracteres no permitidos. Solo se aceptan letras, espacios, guiones y apóstrofes", {
+                    duration: 2000,
+                  })
+                }
+              }}
               className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary"
+              placeholder="Ej: Pérez García"
             />
           </div>
 
@@ -104,9 +162,30 @@ export default function RegistroPage() {
               id="dni"
               name="dni"
               type="text"
+              inputMode="numeric"
               required
               maxLength={8}
               pattern="[0-9]{8}"
+              onKeyDown={(e) => {
+                // Prevenir letras y caracteres especiales, permitir solo números y teclas de control
+                if (e.key.length === 1 && !/^\d$/.test(e.key) && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+                  e.preventDefault()
+                  toast.warning("El DNI solo acepta números (0-9)", {
+                    duration: 2000,
+                  })
+                }
+              }}
+              onInput={(e) => {
+                // Filtrar letras si se pegan o ingresan de otra manera
+                const input = e.currentTarget
+                const valor = input.value.replace(/\D/g, "").slice(0, 8)
+                if (input.value !== valor) {
+                  input.value = valor
+                  toast.warning("Se han eliminado caracteres no permitidos. El DNI solo acepta números", {
+                    duration: 2000,
+                  })
+                }
+              }}
               className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary"
               placeholder="12345678"
             />
