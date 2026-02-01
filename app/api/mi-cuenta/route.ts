@@ -1,14 +1,13 @@
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
+import { getSessionAndUsuario } from "@/lib/auth-helpers"
 
 export async function GET() {
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
-    const id = parseInt((session.user as any).id)
+    const { usuario: existing } = await getSessionAndUsuario()
+    if (!existing) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     const u = await prisma.usuario.findUnique({
-      where: { idprop: id },
+      where: { idprop: existing.idprop },
       select: { nomprop: true, apeprop: true, dniprop: true, emailprop: true, telefonoprop: true, rol: true },
     })
     if (!u) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 })
@@ -20,9 +19,9 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
-    const id = parseInt((session.user as any).id)
+    const { usuario: existing } = await getSessionAndUsuario()
+    if (!existing) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+    const id = existing.idprop
     const body = await req.json()
     const { nomprop, apeprop, dniprop, emailprop, telefonoprop } = body
 

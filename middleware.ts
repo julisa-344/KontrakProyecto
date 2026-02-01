@@ -1,26 +1,26 @@
-import NextAuth from "next-auth"
-import { authConfig } from "@/auth.config"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { getSessionCookie } from "better-auth/cookies"
 
-const { auth } = NextAuth(authConfig)
-
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const pathname = req.nextUrl.pathname
+export function middleware(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request)
+  const pathname = request.nextUrl.pathname
+  const isLoggedIn = !!sessionCookie
 
   const protectedRoutes = ["/mis-reservas", "/historial", "/mi-cuenta"]
+  const authRoutes = ["/login", "/registro"]
 
   if (protectedRoutes.some((route) => pathname.startsWith(route)) && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", req.url))
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  if ((pathname === "/login" || pathname === "/registro") && isLoggedIn) {
-    return NextResponse.redirect(new URL("/catalogo", req.url))
+  if (authRoutes.some((route) => pathname.startsWith(route)) && isLoggedIn) {
+    return NextResponse.redirect(new URL("/catalogo", request.url))
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|auth).*)"],
 }

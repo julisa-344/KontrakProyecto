@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
+import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { Calendar, MessageCircle, CheckCircle, Package } from "lucide-react"
 import { toast } from "sonner"
@@ -13,7 +13,7 @@ interface ReservaFormProps {
 }
 
 export function ReservaForm({ equipoId, precioAlquilo, disponible }: ReservaFormProps) {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

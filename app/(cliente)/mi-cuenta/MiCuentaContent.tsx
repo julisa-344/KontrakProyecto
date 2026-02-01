@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { User, History, LogOut, Pencil, X, Check, Loader2 } from "lucide-react"
@@ -16,7 +16,7 @@ type Usuario = {
 }
 
 export function MiCuentaContent() {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
   const [user, setUser] = useState<Usuario | null>(null)
   const [loading, setLoading] = useState(true)
   const [edit, setEdit] = useState(false)
@@ -104,7 +104,7 @@ export function MiCuentaContent() {
               Historial de pedidos
             </Link>
             <button
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/" } } })}
               className="w-full flex items-center gap-3 px-5 py-4 text-left text-red-600 hover:bg-red-50 transition"
             >
               <LogOut className="w-5 h-5" />

@@ -155,7 +155,7 @@ export default function Home() {
                   },
                 ].map((testi, idx) => (
                   <div key={idx} className="bg-white rounded-2xl shadow p-8 min-w-[320px] max-w-[340px] mx-auto" data-aos="fade-up" data-aos-delay={idx * 150}>
-                    <p className="text-gray-700 text-lg mb-4">“{testi.texto}”</p>
+                    <p className="text-gray-700 text-lg mb-4">"{testi.texto}"</p>
                     <div className="font-bold text-primary">{testi.nombre}</div>
                     <div className="text-sm text-gray-500">{testi.empresa}</div>
                   </div>

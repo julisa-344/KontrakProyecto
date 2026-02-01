@@ -1,22 +1,23 @@
+import { EstadoReserva } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { getSessionAndUsuario } from "@/lib/auth-helpers"
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth()
+    const { usuario } = await getSessionAndUsuario()
 
-    if (!session?.user) {
+    if (!usuario) {
       return NextResponse.json({ count: 0 })
     }
 
-    const userId = parseInt((session.user as any).id)
+    const userId = usuario.idprop
 
     const count = await prisma.reserva.count({
       where: {
         idcli: userId,
         estado: {
-          in: ["PENDIENTE", "CONFIRMADA", "EN_USO", "ESPERANDO_CLIENTE", "ESPERANDO_PROPIETARIO"]
+          in: [EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA]
         }
       }
     })

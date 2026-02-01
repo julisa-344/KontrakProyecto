@@ -1,20 +1,21 @@
-import { auth } from "@/auth"
+import { EstadoReserva, EstadoVehiculo } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
+import { getSessionAndUsuario } from "@/lib/auth-helpers"
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth()
+    const { usuario } = await getSessionAndUsuario()
 
-    if (!session?.user) {
+    if (!usuario) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     }
 
     const reservaId = parseInt(params.id)
-    const userId = parseInt((session.user as any).id)
+    const userId = usuario.idprop
 
     // Buscar la reserva
     const reserva = await prisma.reserva.findUnique({
@@ -36,8 +37,8 @@ export async function POST(
 
     // Validación de estado: ¿Se puede cancelar?
     if (
-      reserva.estado !== "PENDIENTE" &&
-      reserva.estado !== "CONFIRMADA"
+      reserva.estado !== EstadoReserva.PENDIENTE &&
+      reserva.estado !== EstadoReserva.CONFIRMADA
     ) {
       return NextResponse.json(
         { error: "No se puede cancelar una reserva que ya está en uso o finalizada" },
@@ -55,7 +56,7 @@ export async function POST(
       prisma.reserva.update({
         where: { idres: reservaId },
         data: {
-          estado: "CANCELADA",
+          estado: EstadoReserva.CANCELADA,
           fechafinalizacion: new Date()
         }
       }),
@@ -63,7 +64,7 @@ export async function POST(
       prisma.vehiculo.update({
         where: { idveh: reserva.idveh },
         data: {
-          estveh: "DISPONIBLE"
+          estveh: EstadoVehiculo.DISPONIBLE
         }
       })
     ])

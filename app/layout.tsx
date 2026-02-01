@@ -1,8 +1,6 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Header } from "@/components/Header"
-import { Footer } from "@/components/Footer"
 import { Providers } from "@/components/Providers"
 import { AOSInit } from "@/app/aos-init"
 import { Toaster } from "sonner"
@@ -24,11 +22,7 @@ export default function RootLayout({
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Providers>
           <AOSInit />
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          {children}
           <Toaster position="top-right" />
         </Providers>
       </body>

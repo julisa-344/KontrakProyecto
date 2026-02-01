@@ -1,13 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
+import { authClient } from "@/lib/auth-client"
 import { useCart } from "@/components/CartContext"
-import { LogOut, User, Menu, X, ShoppingCart } from "lucide-react"
+import { LogOut, User, Menu, X, ShoppingCart, LayoutDashboard } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export function Header() {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [reservasCount, setReservasCount] = useState(0)
   const { items: cartItems } = useCart()
@@ -46,7 +46,19 @@ export function Header() {
             <Link href="/catalogo" className="hover:bg-white/20 hover:rounded px-2 py-1 -mx-2 transition">
               Catálogo
             </Link>
-            
+            {(session?.user as { rol?: string } | undefined)?.rol?.toUpperCase() === "ADMINISTRADOR" &&
+              process.env.NEXT_PUBLIC_ADMIN_URL && (
+                <a
+                  href={process.env.NEXT_PUBLIC_ADMIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 hover:bg-white/20 hover:rounded px-2 py-1 -mx-2 transition"
+                  title="Panel de administración (abre en nueva pestaña)"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  <span>Panel Admin</span>
+                </a>
+              )}
             {/* Carrito siempre visible */}
             <Link 
               href="/cart"
@@ -80,7 +92,7 @@ export function Header() {
                     <span className="text-sm font-semibold">Cuenta</span>
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/" } } })}
                     className="flex items-center space-x-1 bg-white text-primary hover:bg-white/90 px-4 py-2 rounded-lg font-semibold transition"
                   >
                     <LogOut className="w-4 h-4" />
@@ -117,6 +129,19 @@ export function Header() {
             >
               Catálogo
             </Link>
+            {(session?.user as { rol?: string } | undefined)?.rol?.toUpperCase() === "ADMINISTRADOR" &&
+              process.env.NEXT_PUBLIC_ADMIN_URL && (
+                <a
+                  href={process.env.NEXT_PUBLIC_ADMIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  Panel Admin
+                </a>
+              )}
             <Link
               href="/cart"
               className="block py-2 hover:bg-white/20 hover:rounded px-2 -mx-2 transition flex items-center gap-2"
@@ -150,7 +175,7 @@ export function Header() {
                 <div className="pt-2 border-t border-white/30">
                   <p className="text-sm mb-2">{session.user?.name}</p>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/" } } })}
                     className="w-full bg-white text-primary hover:bg-white/90 px-4 py-2 rounded-lg font-semibold transition"
                   >
                     Cerrar Sesión

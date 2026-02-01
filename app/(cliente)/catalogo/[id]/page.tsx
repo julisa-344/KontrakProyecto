@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useCart } from "@/components/CartContext"
-import { useSession } from "next-auth/react"
+import { authClient } from "@/lib/auth-client"
 import { notFound, useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -10,7 +10,7 @@ import { ArrowRight, CheckCircle, Truck, Clock, Shield, Weight, Ruler, Box } fro
 import { ReservaForm } from "@/components/ReservaForm"
 
 export default function EquipoDetallePage() {
-  const { data: session, status } = useSession()
+  const { data: session, isPending } = authClient.useSession()
   const { addToCart, items: cartItems } = useCart()
   const params = useParams()
   const [equipo, setEquipo] = useState<any>(null)
@@ -66,9 +66,9 @@ export default function EquipoDetallePage() {
         {/* Columna Izquierda: Solo Imagen */}
         <div>
           <div className="relative h-96 bg-gray-200 rounded-lg overflow-hidden mb-6">
-            {equipo.fotoveh ? (
+            {(equipo.imagenUrl ?? equipo.fotoveh) ? (
               <Image
-                src={equipo.fotoveh}
+                src={equipo.imagenUrl ?? equipo.fotoveh}
                 alt={`${equipo.marveh} ${equipo.modveh}`}
                 fill
                 className="object-cover"
@@ -133,7 +133,7 @@ export default function EquipoDetallePage() {
                 id: equipo.idveh,
                 nombre: `${equipo.marveh} ${equipo.modveh}`,
                 precio: equipo.precioalquilo || 0,
-                imagen: equipo.fotoveh || undefined
+                imagen: (equipo.imagenUrl ?? equipo.fotoveh) ?? undefined
               })}
             >
               {cartItems.some((i) => i.id === equipo.idveh) ? "Ya en el carrito" : "Agregar al carrito"}
@@ -208,7 +208,7 @@ export default function EquipoDetallePage() {
             </p>
           )}
 
-          {status === "loading" && (
+          {isPending && (
             <div className="mt-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>

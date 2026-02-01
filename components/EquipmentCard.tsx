@@ -13,9 +13,9 @@ export function EquipmentCard({ equipo }: EquipmentCardProps) {
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
         {/* Imagen */}
         <div className="relative h-48 bg-gray-200">
-          {equipo.fotoveh ? (
+          {(equipo.imagenUrl ?? equipo.fotoveh) ? (
             <Image
-              src={equipo.fotoveh}
+              src={(equipo.imagenUrl ?? equipo.fotoveh)!}
               alt={`${equipo.marveh} ${equipo.modveh}`}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"

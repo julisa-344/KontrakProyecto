@@ -1,5 +1,6 @@
-import { auth } from "@/auth"
+import { EstadoReserva, EstadoVehiculo } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
+import { getSessionAndUsuario } from "@/lib/auth-helpers"
 import { NextRequest, NextResponse } from "next/server"
 
 const ADMIN_WHATSAPP = "51989312330"
@@ -35,11 +36,11 @@ function buildWhatsAppUrl(
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user) {
+    const { session, usuario } = await getSessionAndUsuario()
+    if (!session?.user || !usuario) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     }
-    const userId = parseInt((session.user as any).id)
+    const userId = usuario.idprop
     const body = await req.json()
 
     // ——— Flujo: un solo equipo (detalle) ———
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
 
       const equipo = await prisma.vehiculo.findUnique({ where: { idveh: parseInt(String(equipoId)) } })
       if (!equipo) return NextResponse.json({ error: "Equipo no encontrado" }, { status: 404 })
-      if (equipo.estveh !== "DISPONIBLE") {
+      if (equipo.estveh !== EstadoVehiculo.DISPONIBLE) {
         return NextResponse.json({ error: "El equipo no está disponible" }, { status: 400 })
       }
 
@@ -69,13 +70,13 @@ export async function POST(req: NextRequest) {
             fechainicio: inicio,
             fechafin: fin,
             costo,
-            estado: "PENDIENTE",
+            estado: EstadoReserva.PENDIENTE,
             fechares: new Date(),
           },
         })
         await tx.vehiculo.update({
           where: { idveh: equipo.idveh },
-          data: { estveh: "OCUPADO" },
+          data: { estveh: EstadoVehiculo.OCUPADO },
         })
         return r
       })
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
         resultados.push({ id: item.id, error: "Equipo no encontrado" })
         continue
       }
-      if (equipo.estveh !== "DISPONIBLE") {
+      if (equipo.estveh !== EstadoVehiculo.DISPONIBLE) {
         resultados.push({ id: item.id, error: "El equipo no está disponible" })
         continue
       }
@@ -142,13 +143,13 @@ export async function POST(req: NextRequest) {
               fechainicio: inicio,
               fechafin: fin,
               costo,
-              estado: "PENDIENTE",
+              estado: EstadoReserva.PENDIENTE,
               fechares: new Date(),
             },
           })
           await tx.vehiculo.update({
             where: { idveh: equipo.idveh },
-            data: { estveh: "OCUPADO" },
+            data: { estveh: EstadoVehiculo.OCUPADO },
           })
           return r
         })

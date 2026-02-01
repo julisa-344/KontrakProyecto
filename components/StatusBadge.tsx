@@ -6,7 +6,7 @@ interface StatusBadgeProps {
   className?: string
 }
 
-const estadoConfig = {
+const estadoConfig: Record<EstadoReserva, { label: string; className: string }> = {
   PENDIENTE: {
     label: "Pendiente",
     className: "bg-yellow-100 text-yellow-800 border-yellow-300"
@@ -28,8 +28,8 @@ const estadoConfig = {
     className: "bg-green-100 text-green-800 border-green-300"
   },
   ESPERANDO_PROPIETARIO: {
-    label: "Esperando Devolución",
-    className: "bg-indigo-100 text-indigo-800 border-indigo-300"
+    label: "Esperando Propietario",
+    className: "bg-orange-100 text-orange-800 border-orange-300"
   },
   FINALIZADA: {
     label: "Finalizada",
@@ -37,12 +37,15 @@ const estadoConfig = {
   },
   CANCELADA: {
     label: "Cancelada",
-    className: "bg-orange-100 text-orange-800 border-orange-300"
+    className: "bg-red-100 text-red-800 border-red-300"
   }
 }
 
 export function StatusBadge({ estado, className }: StatusBadgeProps) {
-  const config = estadoConfig[estado]
+  const config = estadoConfig[estado] || {
+    label: estado || "Desconocido",
+    className: "bg-gray-100 text-gray-800 border-gray-300"
+  }
   
   return (
     <span className={cn(

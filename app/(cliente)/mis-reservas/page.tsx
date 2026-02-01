@@ -1,20 +1,20 @@
-import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import type { EstadoReserva } from "@prisma/client"
+import { EstadoReserva } from "@prisma/client"
 import { StatusBadge } from "@/components/StatusBadge"
 import Link from "next/link"
+import { getSessionAndUsuario } from "@/lib/auth-helpers"
 
 export default async function MisReservasPage() {
-  const session = await auth()
+  const { usuario } = await getSessionAndUsuario()
 
-  if (!session?.user) {
+  if (!usuario) {
     redirect("/login")
   }
 
-  const userId = parseInt((session.user as any).id)
+  const userId = usuario.idprop
 
   // Replicar la lógica de Spring: mostrar reservas "vivas" (no finalizadas hace más de 1 día)
   const haceUnDia = new Date()
@@ -26,14 +26,14 @@ export default async function MisReservasPage() {
       OR: [
         {
           estado: {
-            notIn: ["FINALIZADA", "CANCELADA", "RECHAZADA"]
+            notIn: [EstadoReserva.FINALIZADA, EstadoReserva.CANCELADA]
           }
         },
         {
           AND: [
             {
               estado: {
-                in: ["FINALIZADA", "CANCELADA", "RECHAZADA"]
+                in: [EstadoReserva.FINALIZADA, EstadoReserva.CANCELADA]
               }
             },
             {
@@ -70,9 +70,9 @@ export default async function MisReservasPage() {
       ) : (
         <div className="space-y-4">
           {reservas.map((reserva) => {
-            const puedeCancelar = 
-              reserva.estado === "PENDIENTE" || 
-              reserva.estado === "CONFIRMADA"
+            const puedeCancelar =
+              reserva.estado === EstadoReserva.PENDIENTE ||
+              reserva.estado === EstadoReserva.CONFIRMADA
 
             return (
               <div key={reserva.idres} className="bg-white rounded-lg shadow-md p-6">
@@ -82,7 +82,7 @@ export default async function MisReservasPage() {
                       <h3 className="text-xl font-bold text-secondary">
                         {reserva.vehiculo?.marveh} {reserva.vehiculo?.modveh}
                       </h3>
-                      <StatusBadge estado={(reserva.estado || "PENDIENTE") as EstadoReserva} />
+                      <StatusBadge estado={reserva.estado ?? EstadoReserva.PENDIENTE} />
                     </div>
                     <p className="text-gray-600 mb-2">Código: {reserva.vehiculo?.plaveh}</p>
                     <div className="text-sm text-gray-600 space-y-1">

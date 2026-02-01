@@ -1,7 +1,7 @@
 "use client"
 
 import { useCart } from "@/components/CartContext"
-import { useSession } from "next-auth/react"
+import { authClient } from "@/lib/auth-client"
 import Image from "next/image"
 import Link from "next/link"
 import { MessageCircle, CheckCircle, Package, Trash2 } from "lucide-react"
@@ -14,7 +14,7 @@ function getHoyLocal(): string {
 
 export default function CartPage() {
   const { items, removeFromCart, clearCart } = useCart()
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
   const [fechaInicio, setFechaInicio] = useState("")
   const [fechaFin, setFechaFin] = useState("")
   const [fechaError, setFechaError] = useState("")

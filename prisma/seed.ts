@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { EstadoVehiculo, PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -83,7 +83,7 @@ async function main() {
       requiere_certificacion: true,
       horas_uso: 0,
       precioalquilo: 450,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/excavadorahidraulica.png',
       idprop: propietario1.idprop
     },
@@ -101,7 +101,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 120,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/martillohidraulico.png',
       idprop: propietario1.idprop
     },
@@ -119,7 +119,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 150,
       precioalquilo: 180,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/MinicargadorBobcat.png',
       idprop: admin.idprop
     },
@@ -137,7 +137,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 40,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/Paletaincluidaparaminicargador.png',
       idprop: admin.idprop
     },
@@ -155,7 +155,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 70,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/mezcladoradeconcreto.png',
       idprop: propietario1.idprop
     },
@@ -173,7 +173,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 95,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/compactadora450mm.png',
       idprop: admin.idprop
     },
@@ -191,7 +191,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 110,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/placareversibleparacompactadora.png',
       idprop: admin.idprop
     },
@@ -209,7 +209,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 130,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/generadorelectrico.png',
       idprop: propietario1.idprop
     },
@@ -227,7 +227,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 25,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/extencionelectricaindutrial.png',
       idprop: admin.idprop
     },
@@ -245,7 +245,7 @@ async function main() {
       requiere_certificacion: true,
       horas_uso: 400,
       precioalquilo: 320,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/plataformaelevadoradetijera.png',
       idprop: admin.idprop
     },
@@ -263,7 +263,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 30,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/barandilladeseguridaddeplataforma.png',
       idprop: admin.idprop
     },
@@ -281,7 +281,7 @@ async function main() {
       requiere_certificacion: true,
       horas_uso: 600,
       precioalquilo: 280,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/rodillovibratorio.png',
       idprop: propietario1.idprop
     },
@@ -299,7 +299,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 20,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/barandasderodillo.png',
       idprop: propietario1.idprop
     },
@@ -317,7 +317,7 @@ async function main() {
       requiere_certificacion: true,
       horas_uso: 3200,
       precioalquilo: 500,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/camionvolquete.png',
       idprop: admin.idprop
     },
@@ -335,7 +335,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 45,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/cucharondeexcavadora.png',
       idprop: admin.idprop
     },
@@ -353,7 +353,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 85,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/martillodemoledor.png',
       idprop: propietario1.idprop
     },
@@ -371,7 +371,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 15,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/cincelesymaletindemartillodemoledor.png',
       idprop: propietario1.idprop
     },
@@ -389,7 +389,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 150,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/torredeiluminacionLED.png',
       idprop: admin.idprop
     },
@@ -407,7 +407,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 50,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/vibradordeconcreto.png',
       idprop: admin.idprop
     },
@@ -425,7 +425,7 @@ async function main() {
       requiere_certificacion: false,
       horas_uso: 0,
       precioalquilo: 35,
-      estveh: 'DISPONIBLE',
+      estveh: EstadoVehiculo.DISPONIBLE,
       fotoveh: '/products/discodiamantado.png',
       idprop: admin.idprop
     }

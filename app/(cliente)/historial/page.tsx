@@ -1,19 +1,19 @@
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { EstadoReserva } from "@prisma/client";
 import { StatusBadge } from "@/components/StatusBadge";
+import { getSessionAndUsuario } from "@/lib/auth-helpers";
 
 export default async function HistorialPage() {
-  const session = await auth();
+  const { usuario } = await getSessionAndUsuario();
 
-  if (!session?.user) {
+  if (!usuario) {
     redirect("/login");
   }
 
-  const userId = parseInt((session.user as any).id);
+  const userId = usuario.idprop;
 
   // Mostrar todas las reservas del usuario (pedidos): pendientes, en curso y finalizadas
   const reservas = await prisma.reserva.findMany({
@@ -81,7 +81,7 @@ export default async function HistorialPage() {
                     </p>
                   </td>
                   <td className="px-6 py-4">
-                    <StatusBadge estado={(reserva.estado || "PENDIENTE") as EstadoReserva} />
+                    <StatusBadge estado={(reserva.estado ?? "PENDIENTE") as EstadoReserva} />
                   </td>
                   <td className="px-6 py-4 font-bold text-primary">
                     S/. {(reserva.costo ?? 0).toFixed(2)}

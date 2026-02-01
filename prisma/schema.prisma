@@ -34,7 +34,7 @@ model mantenimiento {
   usuario               usuario?               @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkis0owv6xp5ipmv21ki0mw1ah6")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// Reserva con estado tipado por enum (PENDING, CONFIRMED, COMPLETED, CANCELED).
 model reserva {
   costo             Int?
   idcli             Int?
@@ -44,16 +44,73 @@ model reserva {
   fechafinalizacion DateTime?       @db.Timestamp(6)
   fechainicio       DateTime?       @db.Timestamp(6)
   fechares          DateTime?       @db.Timestamp(6)
-  estado            String?         @db.VarChar(255)
+  estado            EstadoReserva?  @default(PENDIENTE)
   mantenimiento     mantenimiento[]
   usuario           usuario?        @relation("ClienteReservas", fields: [idcli], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkhcb7l9qoy85ndceeubthuid7g")
   vehiculo          vehiculo?       @relation(fields: [idveh], references: [idveh], onDelete: NoAction, onUpdate: NoAction, map: "fkj2yfy568nnvlnkxm9k7329j4s")
+}
+
+/// Tablas de Better Auth (user, account, session, verification)
+model user {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  rol           String?   @db.VarChar(255)
+  nomprop       String?   @db.VarChar(255)
+  apeprop       String?   @db.VarChar(255)
+  dniprop       String?   @db.VarChar(255)
+  account       account[]
+  session       session[]
+  usuario       usuario?
+}
+
+model session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model account {
+  id                String   @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  idToken           String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model usuario {
   estprop              Boolean?
   idprop               Int                    @id @default(autoincrement())
+  authUserId           String?                @unique
   apeprop              String?                @db.VarChar(255)
   dniprop              String?                @db.VarChar(255)
   emailprop            String?                @unique @db.VarChar(255)
@@ -65,9 +122,11 @@ model usuario {
   reserva              reserva[]              @relation("ClienteReservas")
   vehiculo             vehiculo[]
   vehiculos_eliminados vehiculos_eliminados[]
+  authUser             user?                  @relation(fields: [authUserId], references: [id], onDelete: SetNull)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// Vehículo: fotoveh e imagenUrl aceptan rutas locales o URLs externas (Text para URLs largas).
+/// estveh usa el enum EstadoVehiculo (DISPONIBLE, OCUPADO, EN_MANTENIMIENTO, FUERA_SERVICIO).
 model vehiculo {
   anioveh                Int?
   fecharegistro          DateTime?              @db.Date
@@ -82,8 +141,9 @@ model vehiculo {
   capacidad              String?                @db.VarChar(255)
   categoria              String?                @db.VarChar(255)
   dimensiones            String?                @db.VarChar(255)
-  estveh                 String?                @db.VarChar(255)
-  fotoveh                String?                @db.VarChar(255)
+  estveh                 EstadoVehiculo?
+  fotoveh                String?                @db.Text
+  imagenUrl              String?                @db.Text
   marveh                 String?                @db.VarChar(255)
   modveh                 String?                @db.VarChar(255) @unique
   plaveh                 String?                @db.VarChar(255)
@@ -107,7 +167,6 @@ enum Rol {
   PROPIETARIO
   CLIENTE
   ADMINISTRADOR
-  CONTRATISTA
 }
 
 enum EstadoVehiculo {
@@ -117,6 +176,7 @@ enum EstadoVehiculo {
   FUERA_SERVICIO
 }
 
+/// Estados de reserva para el flujo principal (Dashboard y Cliente).
 enum EstadoReserva {
   PENDIENTE
   CONFIRMADA

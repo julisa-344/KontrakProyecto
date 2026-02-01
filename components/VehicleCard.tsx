@@ -13,9 +13,9 @@ export function VehicleCard({ vehiculo }: VehicleCardProps) {
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
         {/* Imagen */}
         <div className="relative h-48 bg-gray-200">
-          {vehiculo.fotoveh ? (
+          {(vehiculo.imagenUrl ?? vehiculo.fotoveh) ? (
             <Image
-              src={vehiculo.fotoveh}
+              src={(vehiculo.imagenUrl ?? vehiculo.fotoveh)!}
               alt={`${vehiculo.marveh} ${vehiculo.modveh}`}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"

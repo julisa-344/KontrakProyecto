@@ -1,3 +1,4 @@
+import { EstadoVehiculo } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { EquipmentCard } from "@/components/EquipmentCard"
 import Link from "next/link";
@@ -24,7 +25,7 @@ export default async function CatalogoPage({
 
   const vehiculos = await prisma.vehiculo.findMany({
     where: {
-      estveh: "DISPONIBLE",
+      estveh: EstadoVehiculo.DISPONIBLE,
       ...(searchParams.categoria && {
         categoria: searchParams.categoria
       })
@@ -34,7 +35,7 @@ export default async function CatalogoPage({
 
   const categorias = await prisma.vehiculo.findMany({
     where: {
-      estveh: "DISPONIBLE"
+      estveh: EstadoVehiculo.DISPONIBLE
     },
     select: {
       categoria: true
