@@ -34,7 +34,7 @@ model mantenimiento {
   usuario               usuario?               @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkis0owv6xp5ipmv21ki0mw1ah6")
 }
 
-/// Reserva con estado tipado por enum (PENDING, CONFIRMED, COMPLETED, CANCELED).
+/// Reserva con estado tipado por enum (PENDIENTE, CONFIRMADA, FINALIZADA, CANCELADA).
 model reserva {
   costo             Int?
   idcli             Int?
@@ -45,6 +45,15 @@ model reserva {
   fechainicio       DateTime?       @db.Timestamp(6)
   fechares          DateTime?       @db.Timestamp(6)
   estado            EstadoReserva?  @default(PENDIENTE)
+  
+  // Campos de auditoría
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @default(now()) @updatedAt
+  created_by        Int?
+  updated_by        Int?
+  deleted_at        DateTime?       // Soft delete
+  deleted_by        Int?
+  
   mantenimiento     mantenimiento[]
   usuario           usuario?        @relation("ClienteReservas", fields: [idcli], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fkhcb7l9qoy85ndceeubthuid7g")
   vehiculo          vehiculo?       @relation(fields: [idveh], references: [idveh], onDelete: NoAction, onUpdate: NoAction, map: "fkj2yfy568nnvlnkxm9k7329j4s")
@@ -118,6 +127,15 @@ model usuario {
   password             String?                @db.VarChar(255)
   rol                  String?                @db.VarChar(255)
   telefonoprop         String?                @db.VarChar(20)
+  
+  // Campos de auditoría
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now()) @updatedAt
+  created_by           Int?
+  updated_by           Int?
+  deleted_at           DateTime?              // Soft delete
+  deleted_by           Int?
+  
   mantenimiento        mantenimiento[]
   reserva              reserva[]              @relation("ClienteReservas")
   vehiculo             vehiculo[]
@@ -147,6 +165,16 @@ model vehiculo {
   marveh                 String?                @db.VarChar(255)
   modveh                 String?                @db.VarChar(255) @unique
   plaveh                 String?                @db.VarChar(255)
+  marca_id               Int?
+  
+  // Campos de auditoría
+  created_at             DateTime               @default(now())
+  updated_at             DateTime               @default(now()) @updatedAt
+  created_by             Int?
+  updated_by             Int?
+  deleted_at             DateTime?              // Soft delete
+  deleted_by             Int?
+  
   mantenimiento          mantenimiento[]
   reserva                reserva[]
   usuario                usuario?               @relation(fields: [idprop], references: [idprop], onDelete: NoAction, onUpdate: NoAction, map: "fk2pu1225mw666tkb93d0dhd49v")
@@ -176,14 +204,10 @@ enum EstadoVehiculo {
   FUERA_SERVICIO
 }
 
-/// Estados de reserva para el flujo principal (Dashboard y Cliente).
+/// Estados de reserva simplificados (4 estados principales).
 enum EstadoReserva {
   PENDIENTE
   CONFIRMADA
-  RECHAZADA
-  ESPERANDO_CLIENTE
-  EN_USO
-  ESPERANDO_PROPIETARIO
   FINALIZADA
   CANCELADA
 }

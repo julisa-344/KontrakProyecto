@@ -15,25 +15,9 @@ const estadoConfig: Record<EstadoReserva, { label: string; className: string }> 
     label: "Confirmada",
     className: "bg-blue-100 text-blue-800 border-blue-300"
   },
-  RECHAZADA: {
-    label: "Rechazada",
-    className: "bg-red-100 text-red-800 border-red-300"
-  },
-  ESPERANDO_CLIENTE: {
-    label: "Esperando Cliente",
-    className: "bg-purple-100 text-purple-800 border-purple-300"
-  },
-  EN_USO: {
-    label: "En Uso",
-    className: "bg-green-100 text-green-800 border-green-300"
-  },
-  ESPERANDO_PROPIETARIO: {
-    label: "Esperando Propietario",
-    className: "bg-orange-100 text-orange-800 border-orange-300"
-  },
   FINALIZADA: {
     label: "Finalizada",
-    className: "bg-gray-100 text-gray-800 border-gray-300"
+    className: "bg-green-100 text-green-800 border-green-300"
   },
   CANCELADA: {
     label: "Cancelada",
